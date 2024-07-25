@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>问卷游戏</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        h1 {
+            text-align: center;
+        }
+        .question {
+            display: none;
+        }
+        .question.active {
+            display: block;
+        }
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+        .options li {
+            margin-bottom: 10px;
+        }
+        .options input[type="radio"] {
+            margin-right: 10px;
+        }
+        .red-text {
+            color: red;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s forwards;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .visible {
+            display: block;
+        }
+
+        @keyframes flash {
+            0%, 100% { background-color: black; }
+            50% { background-color: white; }
+        }
+
+        .flash {
+            animation: flash 0.1s;
+        }
+
+        @keyframes flashShake {
+            0%, 100% { background-color: black; transform: translate(0, 0); }
+            25% { background-color: white; }
+            50% { transform: translate(-10px, 0); }
+            75% { transform: translate(10px, 0); }
+        }
+
+        .flash-shake {
+            animation: flashShake 0.1s;
+        }
+
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <form id="surveyForm">
+        <div class="question active" id="question1">
+            <p id="q1"></p>
+            <button type="button" class="submit-btn hidden" style="display:none;" onclick="nextQuestion(2)">确认</button>
+        </div>
+        <div class="question" id="question2">
+            <p id="q2"></p>
+            <ul class="options" id="q2-options" style="display:none;">
+                <li><label><input type="radio" name="q2" value="睡觉">睡觉</label></li>
+                <li><label><input type="radio" name="q2" value="再看会书吧">再看会书吧</label></li>
+            </ul>
+            <button type="button" class="submit-btn hidden" id="q2-submit" style="display:none;" onclick="handleQ2Submit()">确认</button>
+        </div>
+        <div class="question" id="question3">
+            <p id="q3"></p>
+            <ul class="options" id="q3-options" style="display:none;">
+                <li><label><input type="radio" name="q3" value="从头开始读">从头开始读</label></li>
+                <li><label><input type="radio" name="q3" value="翻到上次没读完的地方继续读">翻到上次没读完的地方继续读</label></li>
+            </ul>
+            <button type="button" class="submit-btn hidden" id="q3-submit" style="display:none;" onclick="handleQ3Submit()">确认</button>
+        </div>
+        <div class="question" id="question4">
+            <p id="q4"></p>
+            <button type="button" class="submit-btn hidden" id="q4-submit" style="display:none;" onclick="handleQ4Submit()">确认</button>
+        </div>
+        <div class="question" id="question5">
+            <p id="q5"></p>
+            <button type="button" class="submit-btn hidden" id="q5-submit" style="display:none;" onclick="handleQ5Submit()">确认</button>
+        </div>
+        <div class="question" id="question6">
+            <p id="q6"></p>
+            <ul class="options" id="q6-options" style="display:none;">
+                <li><label><input type="radio" name="q6" value="病死">病死</label></li>
+                <li><label><input type="radio" name="q6" value="上吊自缢">上吊自缢</label></li>
+                <li><label><input type="radio" name="q6" value="一生顺遂安详离世">一生顺遂安详离世</label></li>
+                <li style="display:none;" id="q6-option4"><label><input type="radio" name="q6" value="毒药自尽" class="red-text">毒药自尽</label></li>
+
+            </ul>
+            <button type="button" class="submit-btn hidden" id="q6-submit" style="display:none;" onclick="setupQuestion6()">确认</button>
+        </div>
+        <div class="question" id="question7">
+            <p id="q7" class="red-text"></p>
+        </div>
+        <div class="question" id="question8">
+            <p id="q8" class="red-text"></p>
+            <ul class="options" id="q8-options" style="display:none;">
+                <li><label><input type="radio" name="q8" value="玉碎">玉碎</label></li>
+                <li><label><input type="radio" name="q8" value="瓦全">瓦全</label></li>
+            </ul>
+            <button type="button" class="submit-btn hidden" id="q8-submit" style="display:none;" onclick="handleQ8Submit()">确认</button>
+        </div>
+        <div class="question" id="question9">
+            <p id="q9" class="red-text"></p>
+        </div>
+        <div class="question" id="question10">
+            <p id="q10" class="red-text"></p>
+        </div>
+        <div class="question" id="question11">
+            <p id="q11" class="red-text"></p>
+            <ul class="options" id="q11-options">
+                <li><label><input type="radio" name="q11" value="不相信" id="option-distrust" class="red-text">不相信</label></li>
+                <li><label><input type="radio" name="q11" value="……" id="option-ellipsis">……</label></li>
+            </ul>
+            <button type="button" class="submit-btn hidden" id="q11-submit" style="display:none;" onclick="handleQ11Submit()">确认</button>
+        </div>
+        <div class="question" id="question12">
+            <p id="q12" class="red-text"></p>
+            <ul class="options" id="q12-options" style="display:none;">
+                <li><label><input type="radio" name="q12" value="相信">相信</label></li>
+                <li><label><input type="radio" name="q12" value="相信">相信</label></li>
+                <li><label><input type="radio" name="q12" value="相信">相信</label></li>
+                <li><label><input type="radio" name="q12" value="相信">相信</label></li>
+                <li><label><input type="radio" name="q12" value="相信">相信</label></li>
+            </ul>
+            <button type="button" class="submit-btn hidden" id="q12-submit" style="display:none;" onclick="nextQuestion(13)">确认</button>
+        </div>
+        <div class="question" id="question13">
+            <p id="q13" class="red-text"></p>
+            <ul class="options" id="q13-options" style="display:none;">
+                <li><label><input type="radio" name="q13" value="你是谁？">你是谁？</label></li>
+                <li><label><input type="radio" name="q13" value="同意">同意</label></li>
+                <li><label><input type="radio" name="q13" value="不同意">不同意</label></li>
+            </ul>
+            <button type="button" class="submit-btn hidden" id="q13-submit" style="display:none;" onclick="handleQ13Submit()">确认</button>
+        </div>
+        <div class="question" id="question14">
+            <p id="q14" class="red-text"></p>
+            <ul class="options" id="q14-options" style="display:none;">
+                <li><label><input type="radio" name="q14" value="好">好</label></li>
+                <li><label><input type="radio" name="q14" value="当然">当然</label></li>
+                <li><label><input type="radio" name="q14" value="我答应你">我答应你</label></li>
+                <li><label><input type="radio" name="q14" value="我们和解">我们和解</label></li>
+            </ul>
+            <button type="button" class="submit-btn hidden" id="q14-submit" style="display:none;" onclick="nextQuestion(15)">确认</button>
+        </div>
+        <div class="question" id="question15">
+            <p id="q15" class="red-text"></p>
+            <ul class="options" id="q15-options" style="display:none;">
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+                <li><label><input type="radio" name="q15" value="我也爱你">我也爱你</label></li>
+            </ul>
+            <button type="button" class="submit-btn hidden" id="q15-submit" style="display:none;" onclick="nextQuestion(16)">确认</button>
+        </div>
+        <div class="question" id="question16">
+            <p id="q16" class="red-text"></p>
+            <input type="text" id="q16-input" oninput="simulateInput(this, '范闲，我也爱你。')" style="display:none;" required>
+            <button type="button" class="submit-btn hidden" id="q16-submit" style="display:none;" onclick="nextQuestion(17)">确认</button>
+        </div>
+        <div class="question" id="question17">
+            <p id="q17" class="red-text"></p>
+        </div>
+    </form>
+    <div id="response" style="margin-top: 20px;"></div>
+</div>
+
+<script>
+    let questionTexts = [
+        "warning：本游戏灵感来源于itch上的游戏please-answer-carefully（又称女鬼模拟器），游戏原址https://litrouke.itch.io/please-answer-carefully。如有侵权将即刻删除。" +
+        "\n游戏原作：《庆余年》，cp：闲泽，全程为李承泽视角。内涵闪屏，轻微恐怖元素，ooc预警。\n该游戏为粗制滥造一时兴起的产物，游戏过程中若感到不适请立刻退出。" +
+        "\n确保您已悉知以上信息后点击确认继续游戏。",
+        "不知不觉到了凌晨12点，现在还要做点什么吗？",
+        "你打开了放在床头的《红楼》，非常厚实的一本，放在手里很安心。",
+        "宝玉看罢，因笑道：“这个妹妹我曾见过的”。读完这句后，你才恍然发现后面的字全部消失了，你往后翻了翻，后面的书页居然都变成了空白，仿佛故事到此才刚刚开始，正待书写。",
+        "你翻到上次没读完的地方，书页居然是空白的。你往前一页页翻去，只见全文的最后一句是：宝玉看罢，因笑道：“这个妹妹我曾见过的”。",
+        "你怔怔看了那句一会，下方不知何时浮现出一行血字：\n你觉得林黛玉的结局应该是什么？",
+        "不要死……求你。",
+        "玉碎和瓦全你选哪一个？",
+        "我总不能拦着你死，你早就算到了是吗？",
+        "那你为什么……为什么不等我，我可以救你。",
+        "那你相信一见钟情吗？",
+        "你相信一见钟情吗？",
+        "那我们和解。",
+        "我许你一世平安，答应我吧。",
+        "我爱你。",
+        "喊我的名字好吗？你知道我是谁，对吗？告诉我你也爱我。",
+        "睡吧，承泽，我很快就来找你。"
+    ];
+    let currentQuestion = 1;
+
+    document.addEventListener('DOMContentLoaded', (event) => {
+        typeEffect(document.getElementById('q1'), questionTexts[0], () => {
+            document.querySelector('#question1 .submit-btn').style.display = 'block';
+        });
+    });
+
+    //
+    document.addEventListener('DOMContentLoaded', function() {
+        setupFadeInOptions();
+    });
+
+    function setupFadeInOptions() {
+        const questionContainers = document.querySelectorAll('.question');
+        questionContainers.forEach((questionContainer) => {
+            const options = questionContainer.querySelectorAll('.options li');
+            fadeInOptionsSequentially(options, 0);
+        });
+
+        const radioButtons = document.querySelectorAll('.options input[type="radio"]');
+        radioButtons.forEach(radioButton => {
+            radioButton.addEventListener('change', function() {
+                const submitButton = this.closest('.question').querySelector('.submit-btn');
+                if (submitButton) {
+                    submitButton.classList.remove('hidden');
+                    submitButton.classList.add('visible');
+                }
+            });
+        });
+    }
+
+    function fadeInOptionsSequentially(options, index) {
+        if (index >= options.length) return;
+
+        options[index].classList.add('fade-in');
+        options[index].style.opacity = 1;
+        setTimeout(() => {
+            fadeInOptionsSequentially(options, index + 1);
+        }, 1000); // 每个选项间隔1秒淡入
+    }
+
+
+    function typeEffect(element, text, callback) {
+        let i = 0;
+        element.innerHTML = '';
+        let timer = setInterval(function() {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+            } else {
+                clearInterval(timer);
+                if (callback) callback();
+            }
+        }, 100);
+    }
+
+
+    //
+    function flashScreen(callback) {
+        document.body.classList.add('flash-shake');
+        setTimeout(() => {
+            document.body.classList.remove('flash-shake');
+            if (callback) callback();
+        }, 500); // 闪屏效果持续时间为0.5秒
+    }
+
+    function nextQuestionWithFlash(next) {
+        if (currentQuestion === 7) {
+            flashScreen(() => {
+                nextQuestion(next);
+            });
+        }
+        else if(currentQuestion === 9){
+            flashScreen(() => {
+                nextQuestion(next);
+            });
+        }
+        else if(currentQuestion === 10){
+            flashScreen(() => {
+                nextQuestion(next);
+            });
+        }
+        else {
+            nextQuestion(next);
+        }
+    }
+
+    function nextQuestion(next) {
+        document.getElementById('question' + currentQuestion).classList.remove('active');
+        currentQuestion = next;
+        const nextQElement = document.getElementById('question' + next);
+        nextQElement.classList.add('active');
+
+        if (next === 2) {
+            let p = document.getElementById('q2');
+            typeEffect(p, questionTexts[1], () => {
+                document.getElementById('q2-options').style.display = 'block';
+                document.getElementById('q2-submit').style.display = 'block';
+            });
+        } else if (next === 3) {
+            let p = document.getElementById('q3');
+            typeEffect(p, questionTexts[2], () => {
+                document.getElementById('q3-options').style.display = 'block';
+                document.getElementById('q3-submit').style.display = 'block';
+            });
+        } else if (next === 4) {
+            let p = document.getElementById('q4');
+            typeEffect(p, questionTexts[3], () => {
+                document.querySelector('#question4 .submit-btn').style.display = 'block';
+            });
+        } else if (next === 5) {
+            let p = document.getElementById('q5');
+            typeEffect(p, questionTexts[4], () => {
+                document.querySelector('#question5 .submit-btn').style.display = 'block';
+            });
+        } else if (next === 6) {
+            let p = document.getElementById('q6');
+            typeEffect(p, questionTexts[5], () => {
+                document.getElementById('q6-options').style.display = 'block';
+                document.getElementById('q6-submit').style.display = 'block';
+            });
+        } else if (next === 7) {
+            let p = document.getElementById('q7');
+            typeEffect(p, questionTexts[6], () => {
+                handleQ7Complete();
+            });
+        } else if (next === 8) {
+            let p = document.getElementById('q8');
+            typeEffect(p, questionTexts[7], () => {
+                document.getElementById('q8-options').style.display = 'block';
+                document.getElementById('q8-submit').style.display = 'block';
+            });
+        } else if (next === 9) {
+            let p = document.getElementById('q9');
+            typeEffect(p, questionTexts[8], () => {
+                handleQ9Complete();
+            });
+        } else if (next === 10) {
+            let p = document.getElementById('q10');
+            typeEffect(p, questionTexts[9], () => {
+                handleQ10Complete();
+            });
+        } else if (next === 11) {
+            let p = document.getElementById('q11');
+            typeEffect(p, questionTexts[10], () => {
+                document.getElementById('q11-options').style.display = 'block';
+                document.getElementById('q11-submit').style.display = 'block';
+            });
+        } else if (next === 12) {
+            let p = document.getElementById('q12');
+            typeEffect(p, questionTexts[11], () => {
+                document.getElementById('q12-options').style.display = 'block';
+                document.getElementById('q12-submit').style.display = 'block';
+            });
+        } else if (next === 13) {
+            let p = document.getElementById('q13');
+            typeEffect(p, questionTexts[12], () => {
+                document.getElementById('q13-options').style.display = 'block';
+                document.getElementById('q13-submit').style.display = 'block';
+            });
+        } else if (next === 14) {
+            let p = document.getElementById('q14');
+            typeEffect(p, questionTexts[13], () => {
+                document.getElementById('q14-options').style.display = 'block';
+                document.getElementById('q14-submit').style.display = 'block';
+            });
+        } else if (next === 15) {
+            let p = document.getElementById('q15');
+            typeEffect(p, questionTexts[14], () => {
+                document.getElementById('q15-options').style.display = 'block';
+                document.getElementById('q15-submit').style.display = 'block';
+            });
+        } else if (next === 16) {
+            let p = document.getElementById('q16');
+            typeEffect(p, questionTexts[15], () => {
+                document.getElementById('q16-input').style.display = 'block';
+            });
+        } else if (next === 17) {
+            let p = document.getElementById('q17');
+            typeEffect(p, questionTexts[16]);
+        }
+    }
+
+    function sleep() {
+        nextQuestion(1);
+    }
+
+    function handleQ2Submit() {
+        const selectedOption = document.querySelector('input[name="q2"]:checked');
+        if (selectedOption) {
+            if (selectedOption.value === '睡觉') {
+                nextQuestion(1);
+            } else {
+                nextQuestion(3);
+            }
+        }
+    }
+
+    function handleQ3Submit() {
+        const selectedOption = document.querySelector('input[name="q3"]:checked');
+        if (selectedOption) {
+            if (selectedOption.value === '从头开始读') {
+                nextQuestion(4);
+            } else {
+                nextQuestion(5);
+            }
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        setupQuestion6();
+    });
+
+    function handleQ4Submit() {
+        // 切换到问题6
+        nextQuestion(6);
+
+        document.body.style.backgroundColor = "black"; // 设置背景为黑色
+        document.body.style.color = "white"; // 设置文本颜色为白色
+
+        // 改变问题框的背景色和文本颜色
+        const containers = document.querySelectorAll('.container');
+        containers.forEach(container => {
+            container.style.backgroundColor = "#333"; // 深灰色作为容器背景色
+            container.style.color = "white"; // 文本颜色为白色
+        });
+
+        // 确保红色文本保持红色
+        document.querySelectorAll('.red-text').forEach(element => {
+            element.style.color = "red";
+        });
+    }
+    function handleQ5Submit() {
+        // 切换到问题6
+        nextQuestion(6);
+
+        document.body.style.backgroundColor = "black"; // 设置背景为黑色
+        document.body.style.color = "white"; // 设置文本颜色为白色
+
+        // 改变问题框的背景色和文本颜色
+        const containers = document.querySelectorAll('.container');
+        containers.forEach(container => {
+            container.style.backgroundColor = "#333"; // 深灰色作为容器背景色
+            container.style.color = "white"; // 文本颜色为白色
+        });
+
+        // 确保红色文本保持红色
+        document.querySelectorAll('.red-text').forEach(element => {
+            element.style.color = "red";
+        });
+    }
+    function setupQuestion6() {
+        const q6Options = document.querySelectorAll('#q6-options input[type="radio"]');
+        q6Options.forEach(option => {
+            option.addEventListener('change', function() {
+                // 显示第四个选项
+                document.getElementById('q6-option4').style.display = 'list-item';
+
+                // 确保提交按钮只在选择后显示
+                document.getElementById('q6-submit').style.display = 'block';
+            });
+        });
+
+        // 处理提交按钮的逻辑
+        document.getElementById('q6-submit').addEventListener('click', function() {
+            const selectedOption = document.querySelector('input[name="q6"]:checked').value;
+            switch (selectedOption) {
+                case '病死':
+                case '毒药自尽':
+                case '上吊自缢':
+                    nextQuestion(7);
+                    break;
+                case '一生顺遂安详离世':
+                    nextQuestion(8);
+                    break;
+            }
+        });
+    }
+
+
+    function handleQ7Complete() {
+        nextQuestionWithFlash(8);
+    }
+
+    function handleQ9Complete() {
+        nextQuestionWithFlash(11);
+    }
+    function handleQ10Complete() {
+        nextQuestionWithFlash(11);
+    }
+    function handleQ8Submit() {
+        const selectedOption = document.querySelector('input[name="q8"]:checked');
+        if (selectedOption) {
+            if (selectedOption.value === '玉碎') {
+                nextQuestion(9);
+            } else {
+                nextQuestion(10);
+            }
+        }
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const optionDistrust = document.getElementById('option-distrust');
+        const labelDistrust = optionDistrust.parentNode;
+
+        optionDistrust.addEventListener('change', function() {
+            if (optionDistrust.checked) {
+                labelDistrust.childNodes[1].nodeValue = " 相信"; // 更新标签文本，保留输入元素
+                optionDistrust.value = "相信"; // 更新输入的值以反映当前状态
+                document.getElementById('q11-submit').style.display = 'block'; // 显示确认按钮
+            }
+        });
+    });
+
+    function handleQ11Submit() {
+        const selectedOption = document.querySelector('input[name="q11"]:checked').value;
+        if (selectedOption === "相信") {
+            nextQuestion(13); // 如果用户最终选择“相信”，跳转到问题12
+        } else {
+            nextQuestion(12); // 否则跳转到问题13
+        }
+    }
+
+    function handleQ13Submit() {
+        const selectedOption = document.querySelector('input[name="q13"]:checked');
+        if (selectedOption) {
+            if (selectedOption.value === '同意') {
+                nextQuestion(15);
+            } else {
+                nextQuestion(14);
+            }
+        }
+    }
+
+    function simulateInput(input, expectedText) {
+        let currentLength = input.value.length;
+        let outputText = expectedText.substring(0, currentLength);
+        input.value = outputText;
+        if (currentLength === expectedText.length) {
+            input.disabled = true;
+            document.getElementById('q16-submit').style.display = 'block';
+        }
+    }
+</script>
+</body>
+</html>
