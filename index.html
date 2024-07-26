@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>我草有男鬼</title>
+    <title>问卷游戏</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -235,16 +235,20 @@
     <div id="response" style="margin-top: 20px;"></div>
 </div>
 
+<audio id="backgroundAudio" loop>
+    <source src="song.wav" type="audio/wav">
+</audio>
+
 <script>
     let questionTexts = [
-        "warning：本游戏灵感来源于itch上的游戏please-answer-carefully（又称女鬼模拟器），游戏原址https://litrouke.itch.io/please-answer-carefully。如有侵权将即刻删除。" +
-        "\n游戏原作：《庆余年》，cp：闲泽，全程为李承泽视角。内涵闪屏，轻微恐怖元素，ooc预警。\n该游戏为粗制滥造一时兴起的产物，游戏过程中若感到不适请立刻退出。" +
-        "\n确保您已悉知以上信息后点击确认继续游戏。",
+        "warning：本游戏灵感来源于itch上的游戏please-answer-carefully（又称女鬼模拟器），游戏原址https://litrouke.itch.io/please-answer-carefully。如有侵权将即刻删除。游戏原作很精彩，推荐大家都去试试！" +
+        "原作：《庆余年》，cp：闲泽，全程为李承泽视角。内含闪屏，轻微恐怖等元素，ooc预警。该游戏为粗制滥造一时兴起的产物，游戏过程中若感到不适请立刻退出。" +
+        "确保您已悉知以上信息后点击确认继续游戏。",
         "不知不觉到了凌晨12点，现在还要做点什么吗？",
         "你打开了放在床头的《红楼》，非常厚实的一本，放在手里很安心。",
-        "宝玉看罢，因笑道：“这个妹妹我曾见过的”。读完这句后，你才恍然发现后面的字全部消失了，你往后翻了翻，后面的书页居然都变成了空白，仿佛故事到此才刚刚开始，正待书写。",
+        "宝玉看罢，因笑道：“这个妹妹我曾见过的”。读完这句后，你才恍然发现后面的字全部消失了，你往后翻了翻，之后的书页居然都变成了空白，仿佛故事到此才刚刚开始，正待书写。",
         "你翻到上次没读完的地方，书页居然是空白的。你往前一页页翻去，只见全文的最后一句是：宝玉看罢，因笑道：“这个妹妹我曾见过的”。",
-        "你怔怔看了那句一会，下方不知何时浮现出一行血字：\n你觉得林黛玉的结局应该是什么？",
+        "你怔怔看了那句一会，下方不知何时浮现出一行血字：你觉得林黛玉的结局应该是什么？",
         "不要死……求你。",
         "玉碎和瓦全你选哪一个？",
         "我总不能拦着你死，你早就算到了是吗？",
@@ -445,12 +449,17 @@
         nextQuestion(1);
     }
 
+    document.addEventListener('DOMContentLoaded', function() {
+        const audioElement = document.getElementById('backgroundAudio');
+        audioElement.load();
+    });
     function handleQ2Submit() {
         const selectedOption = document.querySelector('input[name="q2"]:checked');
         if (selectedOption) {
             if (selectedOption.value === '睡觉') {
                 nextQuestion(1);
             } else {
+                document.getElementById('backgroundAudio').play();
                 nextQuestion(3);
             }
         }
